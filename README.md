@@ -6,7 +6,7 @@ This is a portfolio project to learn a lot about econometric panel and time seri
 
 **Research Question**
 
-I pose the specious question "Do Democrats really use transit?", and try to estimate the effect of the 2024 Chicago DNC on transit ridership, possibly delving into substitution between transit modes given traffic around the security perimeter.
+I pose the specious question "Do Democrats really use transit?", and try to estimate the effect of the 2024 Chicago DNC on transit ridership, including rideshares.
 
 **Theory of Change**
 
@@ -15,3 +15,7 @@ We assume the DNC is an exogeneous shock that inserts tens of thousands of Democ
 **Modeling Threats**
 
 There are numerous reasons not to believe this model. It's just an exercise after all. I try to list and test them in the accompanying notebooks.
+
+**Tags**
+econometrics, time series modeling, socrata, Amazon S3, open data, panel data, auto-regression, spatial data
+
