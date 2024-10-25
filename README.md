@@ -1,4 +1,5 @@
-# DNC Transit Model
+DNC Effect on Transit
+==============================
 
 **Motivation**
 
@@ -16,6 +17,43 @@ We assume the DNC is an exogeneous shock that inserts tens of thousands of Democ
 
 There are numerous reasons not to believe this model. It's just an exercise after all. I try to list and test them in the accompanying notebooks.
 
-**Tags**
-econometrics, time series modeling, socrata, Amazon S3, open data, panel data, auto-regression, spatial data
+**Tags:**
+econometrics, time series modeling, Socrata, Amazon S3, open data, panel data, auto-regression, spatial data
 
+**Replication**
+
+1. Install scripts in `src` as a local package using `pip install -e .` from the project root directory.
+
+Project Structure
+-----------------
+
+```
+.
+├── AUTHORS.md
+├── LICENSE
+├── README.md
+├── data                    <- (not tracked by git. maybe tracked by DVC)
+│   ├── raw                 <- The original, immutable data dumps from primary or third-party sources.
+│   ├── interim             <- Intermediate data that has been transformed.
+│   ├── final               <- The final, canonical data sets for modeling.
+│   └── replication         <- Final data that was used in a paper, talk, etc.
+|       └── my-paper        <- One folder per task/presentation
+├── docs                    <- Documentation, e.g. data dictionaries, memos, project notes
+├── notebooks               <- Interactive python or R notebooks
+│   ├── exploratory         <- One-offs (one script per task)
+│   └── replication         <- Report-generating scripts that were used in a paper, talk, etc. (one script per presentation)
+├── pipeline                <- The actual data ETL process (a NUMBERED mix of scripts and notebooks)
+├── reports                 <- For all non-data project outputs
+|   ├── exploratory         <- One-offs
+|   |   └── my-task         <- One folder per task/presentation
+|   |       ├── figures     <- Visualizations
+|   |       ├── tables      <- Descriptive tables
+|   |       └── regressions <- Model outputs
+│   └── replication         <- Outputs that were presented in a talk, paper, etc. (promote exploratory subfolders into here)
+├── setup.py                <- Allows importing python files from src into notebooks
+└── src                     <- Refactored helper code
+    ├── data                <- Resusable data ETL steps
+    ├── stats               <- Source code for modeling and statistics
+    ├── viz                 <- Scripts for visualisation of your results, e.g., matplotlib, ggplot2 related.
+    └── util                <- Any helper scripts go here
+```
