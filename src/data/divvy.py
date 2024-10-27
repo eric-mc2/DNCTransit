@@ -52,6 +52,7 @@ class DivvyClient():
 
     def _read_trip_file(self, fp):
         """Helper function to unify schema drift."""
+        # TODO! We should cache these! This takes ~15s per file via s3
         df = pd.read_csv(fp).pipe(self._trip_schema)
         df['start_time'] = pd.to_datetime(df['start_time'], errors='coerce')
         df['end_time'] = pd.to_datetime(df['end_time'], errors='coerce')

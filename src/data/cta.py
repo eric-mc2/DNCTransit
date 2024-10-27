@@ -10,7 +10,7 @@ class CTAClient(Socrata):
     Implemented as a subclass of Socrata so we don't have multiple
     clients clogging up the global environment.
     """
-    def __init__(self, timeout):
+    def __init__(self, timeout:int):
         super().__init__("data.cityofchicago.org", app_token=None, timeout=timeout)
 
     
