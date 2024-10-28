@@ -76,3 +76,10 @@ def ymd_to_iso_sod(x: str):
 
 def ymd_to_iso_eod(x: str):
     return (from_ymd(x) + timedelta(hours=23, minutes=59, seconds=59)).isoformat()
+
+def is_iso(x: str):
+    try:
+        dt.fromisoformat(x)
+        return True
+    except ValueError:
+        return False
