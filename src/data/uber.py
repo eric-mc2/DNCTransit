@@ -55,7 +55,8 @@ class UberClient(CTAClient):
             return dfs[0] # Monthly
         elif all(map(lambda x: x is not None, dfs)):
             # print(f"INFO: Found {len(dfs)}/{len(dfs)} files for {start_date} -> {end_date}")
-            return pd.concat(dfs, ignore_index=True)
+            dfs = pd.concat(dfs, ignore_index=True)
+            return dfs
         elif len(dfs) > 1:
             num_cached = sum(map(lambda x: x is not None, dfs))
             print(f"INFO: Found {num_cached}/{len(dfs)} files for {start_date} -> {end_date}")
@@ -112,21 +113,8 @@ class UberClient(CTAClient):
 
 
     def _fix_uber_schema(self, df):
-        renamer = {"pickup_centroid_location": "start_point",
-                "dropoff_centroid_location": "end_point",
-                "trip_end_timestamp": "end_date",
-                "trip_start_timestamp": "start_date"}
-        df = df.rename(columns=renamer)
         if 'rides' in df.columns:
             df['rides'] = pd.to_numeric(df['rides'], 'coerce')
-        if 'start_point' in df.columns:
-            df['start_point'] = df['start_point'].apply(shape)
-        if 'end_point' in df.columns:
-            df['end_point'] = df['end_point'].apply(shape)
-        if 'start_date' in df.columns:
-            df['start_date'] = pd.to_datetime(df['start_date'],'coerce').dt.date
-        if 'end_date' in df.columns:
-            df['end_date'] = pd.to_datetime(df['end_date'],'coerce').dt.date
         return df
 
 

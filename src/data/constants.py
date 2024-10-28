@@ -20,6 +20,7 @@ BUS_STOPS_TABLE = "https://data.cityofchicago.org/download/pxug-u72f/application
 BUILDINGS_TABLE = "syp8-uezg" # https://data.cityofchicago.org/Buildings/buildings/syp8-uezg
 TRACT_TABLE = "https://data.cityofchicago.org/api/geospatial/5jrd-6zik?method=export&format=GeoJSON"
 COMM_AREA_TABLE = "https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON"
+CHI_BOUNDARY_FILE = "https://data.cityofchicago.org/api/geospatial/qqq8-j68g?method=export&format=GeoJSON"
 
 UNITED_CENTER = ((41,52,50,"N"), (87,40,27,"W")) # lat/lng
 MCCORMICK_PLACE = ((41,51,7,"N"), (87,36,58,"W"))

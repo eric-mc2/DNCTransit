@@ -53,7 +53,9 @@ class DivvyClient():
     def _read_trip_file(self, fp):
         """Helper function to unify schema drift."""
         # TODO! We should cache these! This takes ~15s per file via s3
+        # But they're also pretty big, so maybe not since we really just want to agg them.
         df = pd.read_csv(fp).pipe(self._trip_schema)
+        # Note: station_ids are always a mix of numeric and non-numeric so keep as strings!!
         df['start_time'] = pd.to_datetime(df['start_time'], errors='coerce')
         df['end_time'] = pd.to_datetime(df['end_time'], errors='coerce')
         if 'start_lng' in df.columns:
@@ -103,6 +105,17 @@ class DivvyClient():
                 'birthday': 'birthyear',
             }))
 
+    def s3_bike_stations(self) -> list[gpd.GeoDataFrame]:
+        """
+        Reads normalized bike station files from S3 into memory.
+        """
+        dfs = []
+        for zip_path, _, station_path in filter(lambda x: x[2], self.get_bucket_paths()):
+            with (self.s3.open(zip_path, mode='rb') as s3f, ZipFile(s3f) as zf, zf.open(station_path) as stationf):
+                df = self.read_station_file(stationf).assign(vintage=basename(zip_path))
+                gdf = self.s3_point_gdf(df, "longitude","latitude","geometry")
+                dfs.append(gdf)
+        return dfs
 
     def s3_bike_trips(self, min_year: int, max_year: int) -> Generator:
         """
@@ -135,6 +148,7 @@ class DivvyClient():
             df = pd.read_csv(fp).pipe(self._station_schema)
         else:
             df = gpd.read_file(fp).pipe(self._station_schema)
+        # Note: station_id is mix numeric and non-numeric ids so don't coerce!!
         keep_cols = ['station_id','name','latitude','longitude','geometry']
         return df.filter(keep_cols)
 
