@@ -80,6 +80,7 @@ def ymd_to_iso_eod(x: str):
 def is_iso(x: str):
     try:
         dt.fromisoformat(x)
-        return True
+        # XXX: Can't find a proper datetime function for this.
+        return 'T' in x
     except ValueError:
         return False
