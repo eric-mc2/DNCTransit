@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-from requests.exceptions import ReadTimeout
 from shapely.geometry import shape
+from requests.exceptions import ReadTimeout
 from urllib3.exceptions import TimeoutError
 
 from data.constants import *
