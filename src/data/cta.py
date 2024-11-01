@@ -37,7 +37,7 @@ class CTAClient(Socrata):
         return df
 
 
-    def _soda_get_coltypes(self, resource):
+    def soda_get_coltypes(self, resource):
         """Query basic table metadata"""
         meta = self.get_metadata(resource)
         colnames = [c['fieldName'] for c in meta['columns']]
@@ -51,7 +51,7 @@ class CTAClient(Socrata):
         Coerce pandas dtypes because SodaPy seems to return everything as strings.
         """
         # Iterate through columns because query may subset columns
-        coltypes = self._soda_get_coltypes(resource)
+        coltypes = self.soda_get_coltypes(resource)
         if select is not None:
             for kv in select.split(','):
                 if ' AS ' in kv:
