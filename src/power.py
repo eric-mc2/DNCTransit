@@ -11,7 +11,7 @@ from statsmodels.stats.power import TTestPower
 from statsmodels.tsa.ar_model import AutoReg, AutoRegResultsWrapper
 
 
-def power_reg(model, delta, exog=None, **kwargs):
+def power_reg(model, effect_size, exog=None, **kwargs):
     """
     Perform power analysis on fitted model.
     
@@ -19,8 +19,8 @@ def power_reg(model, delta, exog=None, **kwargs):
     -----------
     model : RegResults
         Fitted model.
-    delta : float
-        The change to the sum. Not the effect size (change to mean).
+    effect_size : float
+        Change in mean = mean under effect - old mean = delta / nobs
     exog : str
         Variable to test power coef.
     alpha : float
@@ -47,15 +47,15 @@ def power_reg(model, delta, exog=None, **kwargs):
         exog_idx = model.model.exog_names.index(exog)
         model_stats = pd.Series({"mean": 0, "std": model.bse.iloc[exog_idx]})
     else:
-        model_stats = pd.Series({"mean": model.data.endog.mean(), 
+        model_stats = pd.Series({"mean": model.model.data.endog.mean(), 
                              "std": np.sqrt(residual_var)})
     power_stats = power_analysis(model_stats['mean'],
                                 model_stats['std'],
-                                n, delta, **kwargs)
+                                n, effect_size, **kwargs)
     return pd.concat([model_stats, power_stats])
 
 
-def power_uncond(data, group_cols, value_col, delta, **kwargs):
+def power_uncond(data, group_cols, value_col, effect_size, **kwargs):
     """
     Perform power analysis on grouped data (unconditional gaussian).
     
@@ -67,8 +67,8 @@ def power_uncond(data, group_cols, value_col, delta, **kwargs):
         List of columns to group by
     value_col : str
         Name of the column containing the values to analyze
-    delta : float
-        The change to the sum. Not the effect size (change to mean).
+    effect_size : float
+        Change in mean = mean under effect - old mean = delta / nobs
     alpha : float
         Significance level (default: 0.05)
     power : float
@@ -88,18 +88,18 @@ def power_uncond(data, group_cols, value_col, delta, **kwargs):
     power_stats = power_analysis(stats_df['mean'],
                           stats_df['std'],
                           stats_df['count'],
-                          delta, **kwargs)
+                          effect_size, **kwargs)
     return pd.concat([stats_df.reset_index(), power_stats], axis=1)
     
 
-def power_analysis(mean, std, n, delta, alpha=0.05, power=0.8):
+def power_analysis(mean, std, n, effect_size, alpha=0.05, power=0.8):
     """
     Perform power analysis.
     
     Parameters:
     -----------
-    delta : float
-        The change to the sum. Not the effect size (change to mean).
+    effect_size : float
+        Change in mean = mean under effect - old mean = delta / nobs
     alpha : float
         Significance level (default: 0.05)
     power : float
@@ -119,10 +119,6 @@ def power_analysis(mean, std, n, delta, alpha=0.05, power=0.8):
     
     # Calculate MDE
     mde = (z_alpha + z_beta) * std_err
-    
-    # Calculate new means with effect
-    effect_mean = ((mean * n) + delta) / n
-    effect_size = effect_mean - mean
     
     # Calculate test statistics
     t_stat = effect_size / std_err

@@ -1,6 +1,9 @@
 from calendar import monthrange
 from datetime import datetime as dt, timedelta
 from typing import Generator
+import pandas as pd
+from pandas.api.types import is_string_dtype
+import re
 
 from data.constants import YMD
 
@@ -57,6 +60,22 @@ def date_range_daily(query_start_date: str, query_end_date: str) -> Generator:
             # day_end_dt = (day_dt + timedelta(hours=23, minutes=59, seconds=59)).isoformat()
             # yield (day_start_dt, day_end_dt)
 
+def date_aggs(df, datename):
+    if not is_string_dtype(df[datename]):
+        raise ValueError("Require string column.")
+    if not df[datename].apply(is_ymd).all():
+        raise ValueError("Require YMD column.")
+
+    df['year'] = df[datename].str.extract(r"(\d{4})-\d{2}-\d{2}",expand=False)
+    df['monthofyear'] = df[datename].str.extract(r"\d{4}-(\d{2})-\d{2}",expand=False)
+    df['dayofweek'] = df[datename].str.extract(r"\d{4}-\d{2}-(\d{2})",expand=False)
+    df['year-month'] = df[datename].str.extract(r"(\d{4}-\d{2})-\d{2}",expand=False)
+
+    iso_calendar = pd.to_datetime(df[datename]).dt.isocalendar()
+    datepad = lambda x,n: x.astype(str).str.pad(n, 'left', '0')
+    df['weekofyear'] = iso_calendar['week']
+    df['year-week'] = iso_calendar['year'].pipe(datepad, 4) + "-" + iso_calendar['week'].pipe(datepad, 2)
+    return df
 
 def iso_to_ymd(x: str):
     return dt.strftime(dt.fromisoformat(x), YMD)
@@ -68,6 +87,12 @@ def from_ymd(x: str):
 
 def to_ymd(x: str):
     return dt.strftime(x, YMD)
+
+
+def to_yw(x: dt):
+    year = x.isocalendar().year
+    week = x.isocalendar().week
+    return "{}-{}".format(year, str(week).rjust(2, '0'))
 
 
 def ymd_to_iso_sod(x: str):
@@ -84,3 +109,6 @@ def is_iso(x: str):
         return 'T' in x
     except ValueError:
         return False
+
+def is_ymd(x: str):
+    return re.match(r"^\d{4}-\d{2}-\d{2}$", x) is not None
