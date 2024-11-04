@@ -4,7 +4,7 @@ from os.path import basename
 import re
 import s3fs
 from typing import Generator
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipFile
 
 from data.constants import *
 
@@ -39,14 +39,17 @@ class DivvyClient():
         station_filter = lambda x: 'station' in basename(x.lower()) and (csv_filter(x) or shp_filter(x))
         for s3_path in s3_paths:
             with self.s3.open(s3_path, mode='rb') as s3f:
-                with ZipFile(s3f) as zf:
-                    station_path = filter(station_filter, zf.namelist())
-                    station_path = sorted(station_path, key=csv_filter)
-                    station_path = station_path.pop() if station_path else None
-                    for csv_path in filter(trip_filter, zf.namelist()):
-                        yield (s3_path, csv_path, station_path)
-                    if not any(map(csv_filter, zf.namelist())):
-                        print(f"WARNING: Did not find csv in {s3_path}")
+                try:
+                    with ZipFile(s3f) as zf:
+                        station_path = filter(station_filter, zf.namelist())
+                        station_path = sorted(station_path, key=csv_filter)
+                        station_path = station_path.pop() if station_path else None
+                        for csv_path in filter(trip_filter, zf.namelist()):
+                            yield (s3_path, csv_path, station_path)
+                        if not any(map(csv_filter, zf.namelist())):
+                            print(f"WARNING: Did not find csv in {s3_path}")
+                except BadZipFile:
+                    print("DEBUG: Skipping BadZipFile: ", s3_path)
         # Now that this is done, set flag on the class instance.
         self.bucket_paths_cached = True
 
@@ -137,7 +140,6 @@ class DivvyClient():
             # If the data file is within our date range, proceed.
             if min_year <= year and year <= max_year:
                 with self.s3.open(zip_path, mode='rb') as s3f, ZipFile(s3f) as zf, zf.open(trip_path) as tripf:
-                    print("DEBUG: reading ", zip_path)
                     df = self._read_trip_file(tripf).assign(vintage=basename(zip_path))
                     yield df
 
