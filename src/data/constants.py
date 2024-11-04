@@ -50,6 +50,7 @@ COVID = {"TIER_3": "2021-01-02",
 
 LOCAL_CRS = pyproj.CRS("EPSG:3435") # NAD83 / Illinois East (ftUS)
 WORLD_CRS = pyproj.CRS("EPSG:4326") # WGS84
+WEB_CRS = pyproj.CRS("EPSG:3857") # Web Mercador
 
 PROJECT_ROOT = str(Path(__file__).resolve().parents[2])  # assuming this file is at depth=2 from root
 DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
