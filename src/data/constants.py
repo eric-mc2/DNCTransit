@@ -14,6 +14,7 @@ UBER_RIDERSHIP_TABLE = "n26f-ihde" # https://data.cityofchicago.org/resource/n26
 # Stations
 L_STATIONS_TABLE = "8pix-ypme" # https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme
 DIVVY_STATIONS_TABLE = "bbyy-e7gq" # https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq
+DIVVY_STATIONS_GBFS = "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json"
 BUS_ROUTES_TABLE = "6uva-a5ei" # https://data.cityofchicago.org/Transportation/CTA-Bus-Routes/6uva-a5ei
 BUS_STOPS_TABLE = "pxug-u72f" # https://data.cityofchicago.org/Transportation/CTA-Bus-Stops-Shapefile/pxug-u72f
 BUS_STOPS_TABLE = "https://data.cityofchicago.org/download/pxug-u72f/application/x-zip-compressed"
