@@ -33,10 +33,6 @@ DNC_START = "2024-08-19"
 DNC_END = "2024-08-22"
 ERAS_START = "2023-06-02"
 ERAS_END = "2023-06-04"
-# TODO!
-# # Using the Taylor Swift Eras tour as a stand-in for the DNC since transit data isn't updated to August yet.
-# DNC_START = ERAS_START
-# DNC_END = ERAS_END
 DNC_START_ISO = dt.strptime(DNC_START, YMD).isoformat()
 DNC_END_ISO = dt.strptime(DNC_END, YMD).replace(hour=23, minute=59, second=59).isoformat()
 dnc_isoc = dt.strptime(DNC_START, YMD).isocalendar()
