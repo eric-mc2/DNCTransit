@@ -1,6 +1,8 @@
 import pandas as pd
 from sodapy import Socrata
 from typing import Generator
+from dotenv import load_dotenv
+import os
 
 from data.constants import *
 
@@ -11,7 +13,9 @@ class CTAClient(Socrata):
     clients clogging up the global environment.
     """
     def __init__(self, timeout:int):
-        super().__init__("data.cityofchicago.org", app_token=None, timeout=timeout)
+        load_dotenv()
+        app_token = os.environ.get('SOCRATA_APP_TOKEN')
+        super().__init__("data.cityofchicago.org", app_token=app_token, timeout=timeout)
 
     
     def soda_get_all(self, resource, has_header=True, **params):

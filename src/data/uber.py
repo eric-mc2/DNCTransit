@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from shapely.geometry import shape
 from requests.exceptions import ReadTimeout
 from urllib3.exceptions import TimeoutError
 
@@ -50,7 +49,9 @@ class UberClient(CTAClient):
 
         """
         dfs = self._get_cached_uber(start_date, end_date, pickup)
-        if len(dfs) == 1 and dfs[0] is not None:
+        if len(dfs) == 0:
+            pass # Need monthly file. continue to query.
+        elif len(dfs) == 1 and dfs[0] is not None:
             # print(f"INFO: Found cached monthly file {start_date} -> {end_date}")
             return dfs[0] # Monthly
         elif all(map(lambda x: x is not None, dfs)):
@@ -64,7 +65,7 @@ class UberClient(CTAClient):
             # so we know the full query would time out if re-tried.
             raise ReadTimeout("Force caller to split into daily queries")
         else:
-            # Need monthly or daily file. Continue to query.
+            # Need daily file. Continue to query.
             pass
         
         dt_col = "trip_start_timestamp" if pickup else "trip_end_timestamp"

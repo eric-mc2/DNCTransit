@@ -19,7 +19,7 @@ BUS_ROUTES_TABLE = "6uva-a5ei" # https://data.cityofchicago.org/Transportation/C
 BUS_STOPS_TABLE = "pxug-u72f" # https://data.cityofchicago.org/Transportation/CTA-Bus-Stops-Shapefile/pxug-u72f
 BUS_STOPS_TABLE = "https://data.cityofchicago.org/download/pxug-u72f/application/x-zip-compressed"
 BUILDINGS_TABLE = "syp8-uezg" # https://data.cityofchicago.org/Buildings/buildings/syp8-uezg
-TRACT_TABLE = "https://data.cityofchicago.org/api/geospatial/5jrd-6zik?method=export&format=GeoJSON"
+CHI_TRACT_TABLE = "https://data.cityofchicago.org/api/geospatial/5jrd-6zik?method=export&format=GeoJSON"
 COMM_AREA_TABLE = "https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON"
 CHI_BOUNDARY_FILE = "https://data.cityofchicago.org/api/geospatial/qqq8-j68g?method=export&format=GeoJSON"
 
