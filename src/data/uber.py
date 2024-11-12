@@ -16,7 +16,11 @@ class UberClient(CTAClient):
         super().__init__(timeout=timeout)
 
 
-    def soda_get_uber(self, select: str, where_start: str, where_end:str, pickup=True, **kwargs):
+    def soda_get_uber(self, select: str, 
+                      where_start: str, where_end:str, 
+                      pickup=True, 
+                      tract=True,
+                      **kwargs):
         """
         Paginates soda_get_all over query months which is the largest timespan 
         the socrata endpoint can seem to handle.
@@ -27,18 +31,22 @@ class UberClient(CTAClient):
         month_dfs = []
         for month_start_date, month_end_date in date_range_monthly(where_start, where_end):
             try:
-                month_df = self._get_uber(select, month_start_date, month_end_date, pickup, **kwargs)
+                month_df = self._get_uber(select, month_start_date, month_end_date, pickup, tract, **kwargs)
             except (TimeoutError, ReadTimeout):
                 day_dfs = []
                 for day_start_date, day_end_date in date_range_daily(month_start_date, month_end_date):
-                    day_dfs.append(self._get_uber(select, day_start_date, day_end_date, pickup, **kwargs))
+                    day_dfs.append(self._get_uber(select, day_start_date, day_end_date, pickup, tract, **kwargs))
                 month_df = pd.concat(day_dfs, ignore_index=True)
             month_dfs.append(month_df)
         rides = pd.concat(month_dfs, ignore_index=True)
         return rides
 
 
-    def _get_uber(self, select: str, start_date: str, end_date: str, pickup: bool, **kwargs):
+    def _get_uber(self, select: str, 
+                  start_date: str, end_date: str, 
+                  pickup: bool, 
+                  tract: bool,
+                  **kwargs):
         """
         Makes single network call to get uber data, or retrieves cached version.
         Params:
@@ -48,7 +56,7 @@ class UberClient(CTAClient):
             - TimeoutError, ReadTimeout: if query is too big
 
         """
-        dfs = self._get_cached_uber(start_date, end_date, pickup)
+        dfs = self._get_cached_uber(start_date, end_date, pickup, tract)
         if len(dfs) == 0:
             pass # Need monthly file. continue to query.
         elif len(dfs) == 1 and dfs[0] is not None:
@@ -78,12 +86,13 @@ class UberClient(CTAClient):
                                **kwargs) \
                 .pipe(self._fix_uber_schema)
 
-        cache_file = self._cached_filename(start_date, end_date, pickup)
+        cache_file = self._cached_filename(start_date, end_date, pickup, tract)
         df.to_csv(cache_file, index=False)
         return df
 
 
-    def _get_cached_uber(self, start_date: str, end_date: str, pickup: bool) -> list[pd.DataFrame]:
+    def _get_cached_uber(self, start_date: str, end_date: str, 
+                         pickup: bool, tract:bool) -> list[pd.DataFrame]:
         """
         Loads and concatenates monthly or daily cached files.
         Returns None if the entire date range is NOT cached.
@@ -99,14 +108,14 @@ class UberClient(CTAClient):
         month_start_date, month_end_date = next(date_range_monthly(start_date, end_date))
         
         # If the monthly-level file exists, return that
-        cache_file = self._cached_filename(month_start_date, month_end_date, pickup)
+        cache_file = self._cached_filename(month_start_date, month_end_date, pickup, tract)
         if os.path.exists(cache_file):
             return [pd.read_csv(cache_file)]
         
         # Otherwise concatenate together the daily files
         day_dfs = []
         for date, _ in date_range_daily(month_start_date, month_end_date):
-            cache_file = self._cached_filename(date, date, pickup)
+            cache_file = self._cached_filename(date, date, pickup, tract)
             day_df = pd.read_csv(cache_file) if os.path.exists(cache_file) else None
             day_dfs.append(day_df)
         return day_dfs
@@ -119,7 +128,7 @@ class UberClient(CTAClient):
         return df
 
 
-    def _cached_filename(self, start_date: str, end_date: str, pickup: bool):
+    def _cached_filename(self, start_date: str, end_date: str, pickup: bool, tract: bool):
         """
         Resolves filepath to uber data.
         Params:
@@ -127,5 +136,6 @@ class UberClient(CTAClient):
             - end_date: YMD
         """
         pickup = "pickup" if pickup else "dropoff"
-        data_dir = os.path.join(DATA_FOLDER, "raw")
+        subfolder = "uber-tract" if tract else "uber-comm-area"
+        data_dir = os.path.join(DATA_FOLDER, "raw", subfolder)
         return os.path.join(data_dir, f"uber-{pickup}-{start_date}--{end_date}.csv")
