@@ -59,4 +59,8 @@ def plot_poly(gdf, **kwargs):
                 basemap_visible=False,
                 fitbounds="locations",
                 **kwargs)
+    # Set facet names for leaflet
+    if 'facet_col' in kwargs:
+        for trace in fig['data']:
+            trace['name'] = trace['geojson']['features'][0]['properties'][kwargs['facet_col']]
     return fig
