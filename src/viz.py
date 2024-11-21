@@ -29,8 +29,19 @@ def _discretize_color(df, col):
         cscale = px.colors.sequential.Magma
         cidx = pd.qcut(df['rides'], len(cscale)).cat.codes
         return df.assign(cmap = cidx.map(lambda i: cscale[i]))
-    
-def plot_lines(df: gpd.GeoDataFrame, color_col: str = None, animation=None) -> None:
+
+def plot_points(gdf, geom: str = 'geometry', **kwargs):
+    plot_data = gdf.assign(
+        lon = gdf[geom].x,
+        lat = gdf[geom].y
+    )
+    fig = px.scatter_map(plot_data, lat='lat', lon='lon', **kwargs)
+    return fig
+
+def plot_lines(df: gpd.GeoDataFrame, 
+               color_col: str = None, 
+               animation=None,
+               **kwargs) -> None:
     """Create line map in plotly."""
     df = df.pipe(_discretize_color, color_col)
     points = _explode_points(df).to_crs(WEB_CRS)
@@ -42,7 +53,8 @@ def plot_lines(df: gpd.GeoDataFrame, color_col: str = None, animation=None) -> N
                       basemap_visible=False,
                       animation_frame=animation,
                       animation_group='route' if animation else None,
-                      color_discrete_map='identity')
+                      color_discrete_map='identity',
+                      **kwargs)
     fig.update_layout(showlegend=False)
     return fig
 

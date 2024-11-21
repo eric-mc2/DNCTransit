@@ -12,15 +12,18 @@ DIVVY_SUB_RIDERSHIP_TABLE = "4am4-35ir" # https://data.cityofchicago.org/Transpo
 UBER_RIDERSHIP_TABLE = "n26f-ihde" # https://data.cityofchicago.org/resource/n26f-ihde
 
 # Stations
+geojson_base_url = "https://data.cityofchicago.org/download/{}/application/x-zip-compressed".format
 L_STATIONS_TABLE = "8pix-ypme" # https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme
+L_LINES_TABLE = "https://data.cityofchicago.org/resource/xbyr-jnvx.geojson"
 DIVVY_STATIONS_TABLE = "bbyy-e7gq" # https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq
 DIVVY_STATIONS_GBFS = "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json"
 BUS_ROUTES_TABLE = "6uva-a5ei" # https://data.cityofchicago.org/Transportation/CTA-Bus-Routes/6uva-a5ei
 BUS_STOPS_TABLE = "pxug-u72f" # https://data.cityofchicago.org/Transportation/CTA-Bus-Stops-Shapefile/pxug-u72f
-BUS_STOPS_TABLE = "https://data.cityofchicago.org/download/pxug-u72f/application/x-zip-compressed"
+BUS_STOPS_TABLE = geojson_base_url(BUS_STOPS_TABLE)
 BUILDINGS_TABLE = "syp8-uezg" # https://data.cityofchicago.org/Buildings/buildings/syp8-uezg
-CHI_TRACT_TABLE = "https://data.cityofchicago.org/api/geospatial/5jrd-6zik?method=export&format=GeoJSON"
-COMM_AREA_TABLE = "https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON"
+CHI_TRACT_TABLE = "5jrd-6zik"
+CHI_TRACT_TABLE = geojson_base_url(CHI_TRACT_TABLE)
+COMM_AREA_TABLE = "https://data.cityofchicago.org/resource/igwz-8jzy.geojson"
 CHI_BOUNDARY_FILE = "https://data.cityofchicago.org/api/geospatial/qqq8-j68g?method=export&format=GeoJSON"
 
 UNITED_CENTER = ((41,52,50,"N"), (87,40,27,"W")) # lat/lng
