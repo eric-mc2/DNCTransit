@@ -55,7 +55,7 @@ def power_reg(model, effect_size, exog=None, **kwargs):
     return pd.concat([model_stats, power_stats])
 
 
-def power_uncond(data, group_cols, value_col, effect_size, **kwargs):
+def power_uncond(data, group_cols, value_col, shock, **kwargs):
     """
     Perform power analysis on grouped data (unconditional gaussian).
     
@@ -67,8 +67,8 @@ def power_uncond(data, group_cols, value_col, effect_size, **kwargs):
         List of columns to group by
     value_col : str
         Name of the column containing the values to analyze
-    effect_size : float
-        Change in mean = mean under effect - old mean = delta / nobs
+    shock : float
+        Raw amount of exog to be divided among units.
     alpha : float
         Significance level (default: 0.05)
     power : float
@@ -85,11 +85,17 @@ def power_uncond(data, group_cols, value_col, effect_size, **kwargs):
         'sum',
         'count'
     ])
+
+    old_mean = stats_df['mean']
+    new_mean = (stats_df['sum'] + shock) / stats_df['count']
+    effect_size = new_mean - old_mean
     power_stats = power_analysis(stats_df['mean'],
                           stats_df['std'],
                           stats_df['count'],
                           effect_size, **kwargs)
-    return pd.concat([stats_df.reset_index(), power_stats], axis=1)
+    result = pd.concat([stats_df.reset_index(), power_stats], axis=1)
+    result['mds'] = result['mde'] * result['count']
+    return result
     
 
 def power_analysis(mean, std, n, effect_size, alpha=0.05, power=0.8):
@@ -99,7 +105,7 @@ def power_analysis(mean, std, n, effect_size, alpha=0.05, power=0.8):
     Parameters:
     -----------
     effect_size : float
-        Change in mean = mean under effect - old mean = delta / nobs
+        Difference in means
     alpha : float
         Significance level (default: 0.05)
     power : float
@@ -124,7 +130,6 @@ def power_analysis(mean, std, n, effect_size, alpha=0.05, power=0.8):
     t_stat = effect_size / std_err
     
     # Calculate achieved power
-    z_alpha = stats.norm.ppf(1 - alpha/2)
     ncp = effect_size / std_err
     power_achieved = stats.norm.cdf(ncp - z_alpha)
     
@@ -136,7 +141,6 @@ def power_analysis(mean, std, n, effect_size, alpha=0.05, power=0.8):
         (power_achieved >= power) & 
         (effect_size >= mde) &
         (p_value < alpha)
-
     )
 
     cols = ['mde', 'effect_size', 'power_achieved', 't_stat', 'is_detectable']
