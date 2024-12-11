@@ -2,6 +2,16 @@ import re
 import pandas as pd
 from statsmodels.graphics.dotplots import dot_plot
 import matplotlib.pyplot as plt
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+
+def compute_vif(model):
+    """Helper function to find multi-colinear regressors."""
+    vif = [variance_inflation_factor(model.model.exog, i) for i in range(model.model.exog.shape[1])]
+    vif = pd.Series(dict(zip(model.model.data.cov_names, vif))).reset_index()
+    vif.columns = ["coef", "vif"]
+    return vif[vif['vif'] >= 5]
+
 
 def catvar(df, name, ref=None):
     """Helper function to produce patsy formula for categorical variable."""
