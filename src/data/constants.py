@@ -26,8 +26,6 @@ CHI_TRACT_TABLE = geojson_base_url(CHI_TRACT_TABLE)
 COMM_AREA_TABLE = "https://data.cityofchicago.org/resource/igwz-8jzy.geojson"
 CHI_BOUNDARY_FILE = "https://data.cityofchicago.org/api/geospatial/qqq8-j68g?method=export&format=GeoJSON"
 
-UNITED_CENTER = ((41,52,50,"N"), (87,40,27,"W")) # lat/lng
-MCCORMICK_PLACE = ((41,51,7,"N"), (87,36,58,"W"))
 OHARE_CENTROID = ((41,58,43,"N"), (87,54,17,"W"))
 MIDWAY_CENTROID = ((41,47,10,"N"), (87,45,9,"W"))
 
