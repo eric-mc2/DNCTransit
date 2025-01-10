@@ -116,7 +116,12 @@ class UberClient(CTAClient):
         day_dfs = []
         for date, _ in date_range_daily(month_start_date, month_end_date):
             cache_file = self._cached_filename(date, date, pickup, tract)
-            day_df = pd.read_csv(cache_file) if os.path.exists(cache_file) else None
+            try:
+                day_df = pd.read_csv(cache_file) if os.path.exists(cache_file) else None
+            except pd.errors.EmptyDataError as e:
+                print(cache_file)
+                print(e)
+                day_df = None
             day_dfs.append(day_df)
         return day_dfs
         
