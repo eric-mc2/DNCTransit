@@ -55,6 +55,63 @@ def power_reg(model, effect_size, exog=None, **kwargs):
     return pd.concat([model_stats, power_stats])
 
 
+def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, value_col:str, subset: str = None):
+    """Computes the MDE and Minimal Detectable Shock for diff-in-diff context."""
+    if subset:
+        # We probably only want to compute this over the treated units. 
+        data = data.query(subset)
+    # Log-transform the outcome
+    data = data.assign(logy = data[value_col].apply(np.log1p))
+    # Number of time observations per unit
+    n_times = data.groupby(group_cols + [unit_col])['logy'].count()
+    # Total number of observations
+    n_obs = n_times.groupby(group_cols).sum()
+    # Total number of units
+    n_units = data.groupby(group_cols)[unit_col].nunique()
+    # Number of treated observations
+    n_treated = data.groupby(group_cols)['DNC'].sum()
+    n_untreated = n_obs - n_treated
+    # Pooled mean
+    means = data.groupby(group_cols + [unit_col])['logy'].mean().groupby(group_cols).mean()
+    ar_means = data.groupby(group_cols + [unit_col])[value_col].mean().groupby(group_cols).mean()
+    # Per-unit variance
+    variances = data.groupby(group_cols + [unit_col])['logy'].var()
+    ar_variances = data.groupby(group_cols + [unit_col])[value_col].var()
+    # This is the simple pooled variance.
+    simple_pooled_var = variances.groupby(group_cols).sum() / n_units 
+    ar_simple_pooled_std = (ar_variances.groupby(group_cols).sum() / n_units).apply(np.sqrt)
+    # This is the weighted pooled variance. They are roughly the same.
+    pooled_var = ((n_times - 1) * variances).groupby(group_cols).sum() / (n_obs - n_units)
+    # This is the simple standard error
+    simple_std_err = (simple_pooled_var / n_obs).apply(np.sqrt)
+    # This is the weighted standard error (imbalance in i). They are much more conservative.
+    hmean = n_units / (1 / n_times).groupby(group_cols).sum()
+    std_err = (simple_pooled_var * n_units / hmean).apply(np.sqrt)
+    # This is the weighted standard error (imbalance in t).
+    hmean2 = 2 / (1 / n_treated + 1 / n_untreated)
+    std_err2 = (simple_pooled_var * 2 / hmean2).apply(np.sqrt)
+
+    from scipy import stats
+    alpha = .05
+    beta = .8
+    z_alpha = stats.norm.ppf(1 - alpha/2)
+    z_beta = stats.norm.ppf(beta)
+
+    mde = np.exp((z_alpha + z_beta) * std_err)
+    mde2 = np.exp((z_alpha + z_beta) * std_err2)
+    # Just take the most conservative one
+    mde = pd.concat([mde, mde2], axis=1).max(axis=1)
+    mds = (mde - 1) * means * n_treated
+
+    return pd.concat([
+        ar_means.rename('mean'),
+        ar_simple_pooled_std.rename('std'),
+        (mde - 1).rename('mde'),
+        mds.rename('mds')], 
+        axis=1)
+    
+
+
 def power_uncond(data, group_cols, value_col, shock, **kwargs):
     """
     Perform power analysis on grouped data (unconditional gaussian).
