@@ -79,6 +79,7 @@ def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, valu
     ar_variances = data.groupby(group_cols + [unit_col])[value_col].var()
     # This is the simple pooled variance.
     simple_pooled_var = variances.groupby(group_cols).sum() / n_units 
+    simple_pooled_std = simple_pooled_var.apply(np.sqrt)
     ar_simple_pooled_std = (ar_variances.groupby(group_cols).sum() / n_units).apply(np.sqrt)
     # This is the weighted pooled variance. They are roughly the same.
     pooled_var = ((n_times - 1) * variances).groupby(group_cols).sum() / (n_obs - n_units)
@@ -97,16 +98,22 @@ def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, valu
     z_alpha = stats.norm.ppf(1 - alpha/2)
     z_beta = stats.norm.ppf(beta)
 
-    mde = np.exp((z_alpha + z_beta) * std_err)
-    mde2 = np.exp((z_alpha + z_beta) * std_err2)
     # Just take the most conservative one
-    mde = pd.concat([mde, mde2], axis=1).max(axis=1)
-    mds = (mde - 1) * means * n_treated
+    std_err = pd.concat([std_err, std_err2], axis=1).max(axis=1)
+    mde = np.exp((z_alpha + z_beta) * std_err)
+    mds = (mde - 1) * np.exp(means) * n_treated
 
     return pd.concat([
-        ar_means.rename('mean'),
-        ar_simple_pooled_std.rename('std'),
-        (mde - 1).rename('mde'),
+        means.rename('geo_mean'),
+        np.exp(means).rename('exp(geo_mean)'),
+        ar_means.rename('ar_mean'),
+        simple_pooled_std.rename('geo_std'),
+        ar_simple_pooled_std.rename('ar_std'),
+        std_err.rename('se'),
+        np.exp(std_err).rename('exp(se)').apply("{:.1%}".format),
+        mde.rename('mde').apply("{:.1%}".format),
+        (mde - 1).rename('mdc'),
+        n_treated.rename('n'),
         mds.rename('mds')], 
         axis=1)
     
