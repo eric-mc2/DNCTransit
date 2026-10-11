@@ -5,4 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "DNCTransit"
 version = "0.1"
-dependencies = []
+dependencies = [
+    "geopandas>=1.0.1",
+    "kaleido>=1.5.0",
+    "notebook>=7.5.7",
+    "pandas>=2.3.3",
+    "plotly>=6.9.0",
+    "plotnine>=0.13.6",
+    "pyarrow>=21.0.0",
+    "tableone>=0.9.6",
+    "tabulate>=0.10.0",
+]

@@ -68,7 +68,7 @@ def date_aggs(df, datename):
 
     df['year'] = df[datename].str.extract(r"(\d{4})-\d{2}-\d{2}",expand=False)
     df['monthofyear'] = df[datename].str.extract(r"\d{4}-(\d{2})-\d{2}",expand=False)
-    df['dayofweek'] = df[datename].str.extract(r"\d{4}-\d{2}-(\d{2})",expand=False)
+    df['dayofmonth'] = df[datename].str.extract(r"\d{4}-\d{2}-(\d{2})",expand=False)
     df['year-month'] = df[datename].str.extract(r"(\d{4}-\d{2})-\d{2}",expand=False)
 
     iso_calendar = pd.to_datetime(df[datename]).dt.isocalendar()

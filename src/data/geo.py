@@ -23,12 +23,14 @@ def wkb_geom(gdf, geo_col):
 def meter_to_foot(x: (pd.Series | float)):
     return x * 3.281
 
-
 def foot_to_meter(x: (pd.Series | float)):
     return x * .3048
 
 def foot_to_mi(x: (pd.Series | float)):
     return x * 1.894e-4
+
+def meter_to_mi(x: (pd.Series | float)):
+    return foot_to_mi(meter_to_foot(x))
 
 def label_point_dispersion(gdf: gpd.GeoDataFrame, 
                            pk: (str | list[str]), 
