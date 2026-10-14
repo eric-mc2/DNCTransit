@@ -656,6 +656,7 @@ name = "dnctransit"
 version = "0.1"
 source = { editable = "." }
 dependencies = [
+    { name = "dotenv" },
     { name = "geopandas" },
     { name = "kaleido" },
     { name = "notebook" },
@@ -665,12 +666,14 @@ dependencies = [
     { name = "plotnine" },
     { name = "pyarrow" },
     { name = "pyfixest" },
+    { name = "sodapy" },
     { name = "tableone" },
     { name = "tabulate" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "dotenv", specifier = ">=0.9.9" },
     { name = "geopandas", specifier = ">=1.0.1" },
     { name = "kaleido", specifier = ">=1.5.0" },
     { name = "notebook", specifier = ">=7.5.7" },
@@ -679,8 +682,20 @@ requires-dist = [
     { name = "plotnine", specifier = ">=0.13.6" },
     { name = "pyarrow", specifier = ">=21.0.0" },
     { name = "pyfixest", specifier = ">=0.60.0" },
+    { name = "sodapy", specifier = ">=2.2.0" },
     { name = "tableone", specifier = ">=0.9.6" },
     { name = "tabulate", specifier = ">=0.10.0" },
+]
+
+[[package]]
+name = "dotenv"
+version = "0.9.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dotenv" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
 ]
 
 [[package]]
@@ -3093,6 +3108,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-dotenv"
+version = "1.2.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz", hash = "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0", size = 60824, upload-time = "2026-10-01T05:36:10Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/d1/38f3a3405989a89ac18390803e70c6ad7c7760da4f9b83cbeca0c44a0c72/python_dotenv-1.2.4-py3-none-any.whl", hash = "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc", size = 23266, upload-time = "2026-10-01T05:36:08.633Z" },
+]
+
+[[package]]
 name = "python-json-logger"
 version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4012,6 +4036,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "sodapy"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/1e/d01ef2bc1b6199edfb0d00302fe3642d61a09175dd3e78832c78301b2ab6/sodapy-2.2.0.tar.gz", hash = "sha256:58af376d3bb0dc3a1edc7c8cf9938f5de8f558b35e240438dd83647ac3621981", size = 54750, upload-time = "2022-08-31T13:18:39.719Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d8/27/f092405731decf73bde86b1468ad7d44a5e2623a93101dac0b0d8bd3f914/sodapy-2.2.0-py2.py3-none-any.whl", hash = "sha256:18f13bdec1891f3430ea138354d4aa4a1adfb77893a2f0d577601024221157c4", size = 15111, upload-time = "2022-08-31T13:18:35.062Z" },
 ]
 
 [[package]]

@@ -79,12 +79,6 @@ def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, valu
     ar_variances = data.groupby(group_cols + [unit_col])[value_col].var()
     # This is the simple pooled variance.
     simple_pooled_var = variances.groupby(group_cols).sum() / n_units 
-    simple_pooled_std = simple_pooled_var.apply(np.sqrt)
-    ar_simple_pooled_std = (ar_variances.groupby(group_cols).sum() / n_units).apply(np.sqrt)
-    # This is the weighted pooled variance. They are roughly the same.
-    pooled_var = ((n_times - 1) * variances).groupby(group_cols).sum() / (n_obs - n_units)
-    # This is the simple standard error
-    simple_std_err = (simple_pooled_var / n_obs).apply(np.sqrt)
     # This is the weighted standard error (imbalance in i). They are much more conservative.
     hmean = n_units / (1 / n_times).groupby(group_cols).sum()
     std_err = (simple_pooled_var * n_units / hmean).apply(np.sqrt)
@@ -105,12 +99,8 @@ def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, valu
 
     return pd.concat([
         means.rename('geo_mean'),
-        np.exp(means).rename('exp(geo_mean)'),
         ar_means.rename('ar_mean'),
-        simple_pooled_std.rename('geo_std'),
-        ar_simple_pooled_std.rename('ar_std'),
         std_err.rename('se'),
-        np.exp(std_err).rename('exp(se)').apply("{:.1%}".format),
         mde.rename('mde').apply("{:.1%}".format),
         (mde - 1).rename('mdc'),
         n_treated.rename('n'),
@@ -118,6 +108,67 @@ def panel_mde(data:pd.DataFrame, group_cols: list[str] | str, unit_col:str, valu
         axis=1)
     
 
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+
+def panel_mde_ai(data: pd.DataFrame, group_cols: list[str] | str, unit_col: str,
+              time_col: str, value_col: str, treat_col: str = 'DNC',
+              subset: str | None = None, alpha: float = 0.05, power: float = 0.8):
+    """Rough MDE for a two-way FE diff-in-diff, per group.
+
+    treat_col is the observation-level treatment indicator (1 if unit i is
+    treated at time t). Outcome is modeled in logs, so the MDE is a
+    proportional lift.
+    """
+    group_cols = [group_cols] if isinstance(group_cols, str) else list(group_cols)
+    if subset:
+        data = data.query(subset)
+
+    z = stats.norm.ppf(1 - alpha / 2) + stats.norm.ppf(power)
+    rows, keys = [], []
+
+    for key, g in data.groupby(group_cols):
+        y = np.log1p(g[value_col])
+        d = g[treat_col].astype(float)
+
+        # Two-way demeaning (exact for balanced panels, approximate otherwise)
+        def resid(x):
+            return (x - x.groupby(g[unit_col]).transform('mean')
+                      - x.groupby(g[time_col]).transform('mean') + x.mean())
+
+        y_res, d_res = resid(y), resid(d)
+
+        n_units = g[unit_col].nunique()
+        n_times = g[time_col].nunique()
+        dof = len(g) - n_units - n_times + 1
+        ssd = (d_res ** 2).sum()
+
+        if dof <= 0 or ssd == 0:  # no usable treatment variation
+            se = resid_sd = np.inf
+        else:
+            resid_sd = np.sqrt((y_res ** 2).sum() / dof)
+            se = resid_sd / np.sqrt(ssd)
+
+        lift = np.expm1(z * se)
+        treated = g.loc[d == 1, value_col]
+        n_treated = len(treated)
+        ar_mean = treated.mean() if n_treated else np.nan
+
+        keys.append(key)
+        rows.append({
+            'n_units': n_units,
+            'n_treated_obs': n_treated,
+            'resid_sd': resid_sd,   # log scale, after removing unit + time effects
+            'se': se,               # log scale
+            'mdc': lift,            # min detectable lift (0.10 = 10%)
+            'ar_mean': ar_mean,     # mean outcome over treated obs
+            'mds': lift * ar_mean * n_treated,  # min detectable total shock, in outcome units
+        })
+
+    index = pd.MultiIndex.from_tuples(keys, names=group_cols)
+    return pd.DataFrame(rows, index=index)
 
 def power_uncond(data, group_cols, value_col, shock, **kwargs):
     """
