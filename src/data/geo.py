@@ -27,7 +27,10 @@ def foot_to_meter(x: (pd.Series | float)):
     return x * .3048
 
 def foot_to_mi(x: (pd.Series | float)):
-    return x * 1.894e-4
+    return x / 5280.0
+
+def sq_foot_to_sq_mi(x: (pd.Series | float)):
+    return x / (5280.0 * 5280.0)
 
 def meter_to_mi(x: (pd.Series | float)):
     return foot_to_mi(meter_to_foot(x))

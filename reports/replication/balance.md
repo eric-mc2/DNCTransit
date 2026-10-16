@@ -1,32 +1,20 @@
-|       |                             | Not Near DNC    | Near DNC        | P-Value   |
-|-------|-----------------------------|-----------------|-----------------|-----------|
-| train | stations                    | 134             | 8               |           |
-|       | station-days                | 11256           | 637             |           |
-|       | daily rides, mean (SD)      | 2250.5 (2195.3) | 1398.6 (1121.1) | <0.001    |
-|       | log(daily rides), mean (SD) | 7.3 (0.9)       | 6.7 (1.7)       | <0.001    |
-|       | bus_distance, mean (SD)     | 0.1 (0.3)       | 0.0 (0.0)       | 0.010     |
-|       | bike_distance, mean (SD)    | 0.2 (0.5)       | 0.1 (0.1)       | 0.002     |
-|       | sqrt(area), mean (SD)       | 1.5 (2.2)       | 1.9 (2.2)       | 0.578     |
-|       | lat, mean (SD)              | 0.0 (0.0)       | 0.0 (0.0)       | <0.001    |
-|       | long, mean (SD)             | -0.1 (0.0)      | -0.1 (0.0)      | 0.040     |
-|-------|-----------------------------|-----------------|-----------------|-----------|
-| bike  | docks                       | 1519            | 47              |           |
-|       | dock-days                   | 65157           | 3914            |           |
-|       | daily rides, mean (SD)      | 46.5 (73.8)     | 48.9 (37.4)     | <0.001    |
-|       | log(daily rides), mean (SD) | 2.8 (1.6)       | 3.6 (0.8)       | <0.001    |
-|       | train_distance, mean (SD)   | 1.1 (1.1)       | 0.3 (0.2)       | <0.001    |
-|       | bus_distance, mean (SD)     | 0.1 (0.1)       | 0.1 (0.1)       | 0.671     |
-|       | sqrt(area), mean (SD)       | 0.4 (0.7)       | 0.5 (0.4)       | 0.542     |
-|       | lat, mean (SD)              | 0.0 (0.0)       | 0.0 (0.0)       | 0.211     |
-|       | long, mean (SD)             | -0.1 (0.0)      | -0.1 (0.0)      | <0.001    |
-|-------|-----------------------------|-----------------|-----------------|-----------|
-| uber  | tracts                      | 1206            | 40              |           |
-|       | tract-days                  | 81145           | 3341            |           |
-|       | daily rides, mean (SD)      | 237.0 (844.9)   | 810.1 (1973.4)  | <0.001    |
-|       | log(daily rides), mean (SD) | 3.9 (1.7)       | 5.5 (1.5)       | <0.001    |
-|       | train_distance, mean (SD)   | 3.1 (3.8)       | 0.4 (0.2)       | <0.001    |
-|       | bus_distance, mean (SD)     | 1.9 (3.5)       | 0.1 (0.1)       | <0.001    |
-|       | bike_distance, mean (SD)    | 2.1 (3.7)       | 0.2 (0.1)       | <0.001    |
-|       | sqrt(area), mean (SD)       | 0.7 (0.4)       | 0.5 (0.2)       | <0.001    |
-|       | lat, mean (SD)              | 0.0 (0.0)       | 0.0 (0.0)       | 0.196     |
-|       | long, mean (SD)             | -0.1 (0.0)      | -0.1 (0.0)      | <0.001    |
+<table>
+<thead>
+<tr><th>                     </th><th style="text-align: right;">          bike
+Control</th><th style="text-align: right;">          
+Treated</th><th style="text-align: right;">          train
+Control</th><th style="text-align: right;">         
+Treated</th><th style="text-align: right;">          uber
+Control</th><th style="text-align: right;">          
+Treated</th></tr>
+</thead>
+<tbody>
+<tr><td>N units              </td><td style="text-align: right;"> 1549    </td><td style="text-align: right;">  47    </td><td style="text-align: right;">  134    </td><td style="text-align: right;">  8    </td><td style="text-align: right;"> 1217    </td><td style="text-align: right;">  40    </td></tr>
+<tr><td>N unit-years         </td><td style="text-align: right;">76244    </td><td style="text-align: right;">4552    </td><td style="text-align: right;">13132    </td><td style="text-align: right;">714    </td><td style="text-align: right;">95398    </td><td style="text-align: right;">3899    </td></tr>
+<tr><td>N pre                </td><td style="text-align: right;">65165    </td><td style="text-align: right;">3914    </td><td style="text-align: right;">11256    </td><td style="text-align: right;">602    </td><td style="text-align: right;">81757    </td><td style="text-align: right;">3341    </td></tr>
+<tr><td>N post               </td><td style="text-align: right;">11079    </td><td style="text-align: right;"> 638    </td><td style="text-align: right;"> 1876    </td><td style="text-align: right;">112    </td><td style="text-align: right;">13641    </td><td style="text-align: right;"> 558    </td></tr>
+<tr><td>Mean log_rides (pre) </td><td style="text-align: right;">    2.598</td><td style="text-align: right;">   3.569</td><td style="text-align: right;">    7.307</td><td style="text-align: right;">  7.042</td><td style="text-align: right;">    3.796</td><td style="text-align: right;">   5.533</td></tr>
+<tr><td>Mean log_rides (post)</td><td style="text-align: right;">    2.59 </td><td style="text-align: right;">   3.741</td><td style="text-align: right;">    7.313</td><td style="text-align: right;">  7.117</td><td style="text-align: right;">    3.834</td><td style="text-align: right;">   5.668</td></tr>
+<tr><td>% balanced panel     </td><td style="text-align: right;">    0.274</td><td style="text-align: right;">   0.809</td><td style="text-align: right;">    1    </td><td style="text-align: right;">  0.875</td><td style="text-align: right;">    0.552</td><td style="text-align: right;">   0.9  </td></tr>
+</tbody>
+</table>
