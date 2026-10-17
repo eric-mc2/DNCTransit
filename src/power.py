@@ -113,16 +113,18 @@ import pandas as pd
 from scipy import stats
 
 
-def panel_mde_ai(data: pd.DataFrame, group_cols: list[str] | str, unit_col: str,
-              time_col: str, value_col: str, treat_col: str = 'DNC',
+def panel_mde_ai(data: pd.DataFrame,
+                 contrasts: list[str] | str,
+                 unit_col: str,
+                 time_col: str,
+                 value_col: str,
+                 treat_group: str,
+                 treat_period: str,
               subset: str | None = None, alpha: float = 0.05, power: float = 0.8):
     """Rough MDE for a two-way FE diff-in-diff, per group.
-
-    treat_col is the observation-level treatment indicator (1 if unit i is
-    treated at time t). Outcome is modeled in logs, so the MDE is a
-    proportional lift.
+    value_col is in raw (linear) units.
     """
-    group_cols = [group_cols] if isinstance(group_cols, str) else list(group_cols)
+    group_cols = [contrasts] if isinstance(contrasts, str) else list(contrasts)
     if subset:
         data = data.query(subset)
 
@@ -130,8 +132,8 @@ def panel_mde_ai(data: pd.DataFrame, group_cols: list[str] | str, unit_col: str,
     rows, keys = [], []
 
     for key, g in data.groupby(group_cols):
-        y = np.log1p(g[value_col])
-        d = g[treat_col].astype(float)
+        y = np.log(g[value_col])
+        d = (g[treat_group] * g[treat_period]).astype(float)
 
         # Two-way demeaning (exact for balanced panels, approximate otherwise)
         def resid(x):
@@ -141,6 +143,7 @@ def panel_mde_ai(data: pd.DataFrame, group_cols: list[str] | str, unit_col: str,
         y_res, d_res = resid(y), resid(d)
 
         n_units = g[unit_col].nunique()
+        n_treated_units = g[g[treat_group] == 1][unit_col].nunique()
         n_times = g[time_col].nunique()
         dof = len(g) - n_units - n_times + 1
         ssd = (d_res ** 2).sum()
@@ -152,19 +155,20 @@ def panel_mde_ai(data: pd.DataFrame, group_cols: list[str] | str, unit_col: str,
             se = resid_sd / np.sqrt(ssd)
 
         lift = np.expm1(z * se)
-        treated = g.loc[d == 1, value_col]
-        n_treated = len(treated)
-        ar_mean = treated.mean() if n_treated else np.nan
+        baseline = g.loc[(g[treat_group] == 1) & (g[treat_period] == 0), value_col]
+        n_treated = sum(d == 1)
+        ar_mean = baseline.mean() if n_treated else np.nan
 
         keys.append(key)
         rows.append({
             'n_units': n_units,
             'n_treated_obs': n_treated,
-            'resid_sd': resid_sd,   # log scale, after removing unit + time effects
-            'se': se,               # log scale
-            'mdc': lift,            # min detectable lift (0.10 = 10%)
-            'ar_mean': ar_mean,     # mean outcome over treated obs
-            'mds': lift * ar_mean * n_treated,  # min detectable total shock, in outcome units
+            'mean_y_treated': ar_mean,     # mean outcome over treated obs
+            # 'resid_sd': resid_sd,   # log scale, after removing unit + time effects
+            # 'se': se,               # log scale
+            'min_pct_lift': lift,            # min detectable lift (0.10 = 10%)
+            'min_daily_lift': lift * ar_mean * n_treated_units,  # min detectable daily shock, in outcome units
+            'min_total_lift': lift * ar_mean * n_treated,  # min detectable total shock, in outcome units
         })
 
     index = pd.MultiIndex.from_tuples(keys, names=group_cols)
